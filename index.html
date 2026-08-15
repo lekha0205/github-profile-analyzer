@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GitHub Profile Analyzer</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f0ff;
+            color: #24143d;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4c1d95, #7c3aed, #a855f7);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+        }
+
+        .header p {
+            color: #ede9fe;
+            margin-top: 12px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 5px 25px rgba(91, 33, 182, 0.15);
+            text-align: center;
+            border: 1px solid #ddd6fe;
+        }
+
+        .search-box input {
+            width: 70%;
+            padding: 15px;
+            border: 2px solid #ddd6fe;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: #8b5cf6;
+        }
+
+        .search-box button {
+            padding: 15px 28px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6d28d9, #9333ea);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .search-box button:hover {
+            background: #5b21b6;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fce7f3;
+            color: #9d174d;
+        }
+
+        .profile {
+            background: white;
+            margin-top: 25px;
+            padding: 28px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            box-shadow: 0 5px 25px rgba(91, 33, 182, 0.12);
+            border-left: 6px solid #8b5cf6;
+        }
+
+        .profile img {
+            width: 125px;
+            height: 125px;
+            border-radius: 50%;
+            border: 5px solid #c4b5fd;
+        }
+
+        .profile h2 {
+            margin: 0;
+            color: #4c1d95;
+        }
+
+        .profile a {
+            color: #7c3aed;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(91, 33, 182, 0.10);
+            border-top: 4px solid #8b5cf6;
+        }
+
+        .card h3 {
+            margin: 0;
+            font-size: 30px;
+            color: #7c3aed;
+        }
+
+        .card p {
+            color: #6b7280;
+        }
+
+        .section {
+            background: white;
+            margin-top: 20px;
+            padding: 28px;
+            border-radius: 18px;
+            box-shadow: 0 5px 20px rgba(91, 33, 182, 0.10);
+        }
+
+        .section h2 {
+            color: #4c1d95;
+        }
+
+        .score {
+            text-align: center;
+            background: linear-gradient(
+                135deg,
+                #faf5ff,
+                #ede9fe
+            );
+            border: 2px solid #c4b5fd;
+        }
+
+        .score-number {
+            font-size: 65px;
+            font-weight: bold;
+            color: #7c3aed;
+        }
+
+        .rating {
+            font-size: 28px;
+            font-weight: bold;
+            color: #6d28d9;
+        }
+
+        .suggestion {
+            background: #f5f3ff;
+            border-left: 5px solid #8b5cf6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .repo {
+            border: 1px solid #ddd6fe;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 12px;
+            transition: 0.2s;
+        }
+
+        .repo:hover {
+            border-color: #8b5cf6;
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.12);
+        }
+
+        .repo h3 {
+            margin-top: 0;
+            color: #6d28d9;
+        }
+
+        .repo a {
+            color: #7c3aed;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 35px;
+            color: #6b7280;
+        }
+
+        @media (max-width: 600px) {
+
+            .search-box input {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .search-box button {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .profile {
+                flex-direction: column;
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    <h1>💜 GitHub Profile Analyzer</h1>
+
+    <p>
+        Analyze GitHub profiles, repositories,
+        languages and developer activity.
+    </p>
+
+</div>
+
+
+<div class="container">
+
+
+    <div class="search-box">
+
+        <form method="POST">
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Enter GitHub username"
+                value="{{ username }}"
+                required
+            >
+
+            <button type="submit">
+                🔍 Analyze Profile
+            </button>
+
+        </form>
+
+    </div>
+
+
+    {% if error %}
+
+    <div class="error">
+        {{ error }}
+    </div>
+
+    {% endif %}
+
+
+    {% if profile %}
+
+
+    <div class="profile">
+
+        <img
+            src="{{ profile.avatar_url }}"
+            alt="GitHub Profile Picture"
+        >
+
+        <div>
+
+            <h2>
+                {{ profile.name or profile.login }}
+            </h2>
+
+            <p>
+                @{{ profile.login }}
+            </p>
+
+            <p>
+                {{ profile.bio or "No bio available." }}
+            </p>
+
+            <p>
+                📍 {{ profile.location or "Location not provided" }}
+            </p>
+
+            <p>
+
+                <a
+                    href="{{ profile.html_url }}"
+                    target="_blank"
+                >
+                    View GitHub Profile →
+                </a>
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="stats">
+
+
+        <div class="card">
+
+            <h3>
+                {{ analysis.total_repositories }}
+            </h3>
+
+            <p>
+                Repositories
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                {{ analysis.total_stars }}
+            </h3>
+
+            <p>
+                Total Stars ⭐
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                {{ analysis.total_forks }}
+            </h3>
+
+            <p>
+                Total Forks 🍴
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                {{ profile.followers }}
+            </h3>
+
+            <p>
+                Followers
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                {{ profile.following }}
+            </h3>
+
+            <p>
+                Following
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                {{ analysis.top_language }}
+            </h3>
+
+            <p>
+                Top Language
+            </p>
+
+        </div>
+
+
+    </div>
+
+
+    <div class="section score">
+
+        <h2>
+            🏆 Overall Profile Rating
+        </h2>
+
+        <div class="score-number">
+            {{ analysis.score }}/100
+        </div>
+
+        <div class="rating">
+            {{ analysis.rating }}
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>
+            💡 Personalized Suggestions
+        </h2>
+
+
+        {% for suggestion in analysis.suggestions %}
+
+        <div class="suggestion">
+            👉 {{ suggestion }}
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>
+            💻 Programming Languages
+        </h2>
+
+        <div class="chart-container">
+
+            <canvas id="languageChart"></canvas>
+
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>
+            ⭐ Top Repositories
+        </h2>
+
+
+        {% for repo in analysis.top_repositories %}
+
+        <div class="repo">
+
+            <h3>
+                {{ repo.name }}
+            </h3>
+
+            <p>
+                {{ repo.description or "No description available." }}
+            </p>
+
+            <p>
+
+                ⭐ {{ repo.stargazers_count }}
+
+                &nbsp;&nbsp;
+
+                🍴 {{ repo.forks_count }}
+
+                &nbsp;&nbsp;
+
+                💻 {{ repo.language or "Unknown" }}
+
+            </p>
+
+            <a
+                href="{{ repo.html_url }}"
+                target="_blank"
+            >
+                View Repository →
+            </a>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+
+    <script>
+
+        const languageData =
+            {{ analysis.languages | tojson }};
+
+        const labels =
+            Object.keys(languageData);
+
+        const values =
+            Object.values(languageData);
+
+
+        new Chart(
+
+            document.getElementById("languageChart"),
+
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: labels,
+
+                    datasets: [
+                        {
+                            data: values,
+
+                            backgroundColor: [
+                                "#6d28d9",
+                                "#7c3aed",
+                                "#8b5cf6",
+                                "#a855f7",
+                                "#c084fc",
+                                "#d8b4fe"
+                            ],
+
+                            borderWidth: 2
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true
+                }
+            }
+
+        );
+
+    </script>
+
+
+    {% endif %}
+
+
+</div>
+
+
+<div class="footer">
+
+    💜 GitHub Profile Analyzer
+
+    <br>
+
+    Built with Python, Flask and GitHub API
+
+</div>
+
+
+</body>
+
+</html>
